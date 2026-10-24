@@ -15,6 +15,7 @@ Everything below is enabled by default.
 
 | Feature | Behavior |
 | --- | --- |
+| No Thumbnail Bait (experimental) | Replaces ordinary video thumbnails with YouTube's second generated still. Loads near the viewport and keeps the original when unavailable. |
 | Shorts | Hides Shorts cards, shelves, navigation entries and channel tabs. Direct Shorts links open in the regular video player. |
 | Playables | Hides games, their shelves and navigation entries. |
 | Auto-dubbed videos | Hides cards carrying YouTube's English **Auto-dubbed** badge. |
@@ -53,6 +54,8 @@ The popup follows your system's light or dark appearance. Visibility settings up
 - Does not collect searches, watch history or account data.
 - All icons and lettering are bundled locally.
 
+With **No Thumbnail Bait** enabled, generated images are requested directly from YouTube's thumbnail CDN (`i.ytimg.com`). There is no third-party thumbnail service and no video download. Availability results are cached in memory, not in browsing history or persistent storage.
+
 YouTube still receives your normal browsing requests. The extension cleans up the page in your browser.
 
 ## Limits
@@ -60,6 +63,8 @@ YouTube still receives your normal browsing requests. The extension cleans up th
 Old YouTube cleans up the current desktop site; it does not restore an archived YouTube layout or change its recommendation algorithm. It cannot recover search results YouTube did not return, and it is not a general ad blocker. Thumbnail density and autoplay are unchanged.
 
 Auto-dubbed filtering depends on the English badge being present. It hides those cards; it does not switch audio tracks or detect unlabelled dubs. A few navigation labels also depend on YouTube's language.
+
+Generated video stills are usually lower resolution than uploaded thumbnails. The selected frame may be unrepresentative or include text already in the video; this is not a clickbait detector. This feature skips playlist artwork and recognized live/upcoming badges. The image endpoint is undocumented and may not be available for every video.
 
 YouTube regularly changes its markup and tests different layouts, so some selectors may need updating. Mobile YouTube, embedded players and native apps are outside this version's scope. Native search-filter encoding is undocumented, and applying a filter may briefly reload the page.
 
@@ -92,11 +97,12 @@ The preview launcher uses a separate profile in the operating system's temporary
 | --- | --- |
 | `extension/core.js` | Defaults, settings validation and URL handling |
 | `extension/content.js` | Page updates, card detection and search-filter memory |
+| `extension/thumbnails.js` | Lazy video-frame replacement, availability checks and restoration |
 | `extension/content.css` | Reversible hiding rules and layout adjustments |
 | `extension/popup.*` | On/off switch and optional settings |
 | `extension/icons/toolbar.svg` | Editable toolbar icon |
 
-The tests cover defaults, pause/resume, dynamic and recycled cards, client-side navigation, Shorts redirects, native search filters, persistence, resets, auto-dubbed cards, mixes and homepage header spacing. Browser test output goes to the operating system's temporary directory.
+The tests cover defaults, pause/resume, dynamic and recycled cards, client-side navigation, Shorts redirects, native search filters, persistence, resets, auto-dubbed cards, mixes, homepage header spacing and reversible video-frame thumbnails with missing-image fallbacks. Browser test output goes to the operating system's temporary directory.
 
 For selector changes, also check Home, Search, Subscriptions, a channel and a watch page on the live site. Automated tests use fixtures and cannot cover every YouTube experiment.
 

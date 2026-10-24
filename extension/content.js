@@ -4,6 +4,7 @@
   const flags = {
     hideShorts: 'data-oy-shorts', hidePlayables: 'data-oy-playables',
     hideAutoDubbed: 'data-oy-auto-dubbed', hideMixes: 'data-oy-mixes',
+    videoFrames: 'data-oy-frames',
     hideTopics: 'data-oy-topics', hidePromotions: 'data-oy-promotions', cleanSearch: 'data-oy-search',
   };
   const cards = [
@@ -28,6 +29,7 @@
     for (const [key, attribute] of Object.entries(flags)) {
       document.documentElement.toggleAttribute(attribute, ready && preferences.enabled && preferences[key]);
     }
+    globalThis.OldYouTubeFrames.setEnabled(ready && preferences.enabled && preferences.videoFrames);
   }
 
   function classify(card) {
@@ -70,6 +72,7 @@
       const shorts = shelf.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, a[href^="/shorts/"]');
       shelf.toggleAttribute('data-oy-search-shelf', !shorts);
     }
+    globalThis.OldYouTubeFrames.scan();
   }
 
   function hasAutoDubbedBadge(card) {
@@ -146,7 +149,7 @@
     observer = new MutationObserver(scheduleScan);
     observer.observe(document.documentElement, {
       childList: true, subtree: true, characterData: true,
-      attributes: true, attributeFilter: ['href', 'overlay-style', 'title', 'tab-title', 'aria-label', 'label', 'hidden', 'aria-hidden'],
+      attributes: true, attributeFilter: ['href', 'src', 'srcset', 'overlay-style', 'title', 'tab-title', 'aria-label', 'label', 'hidden', 'aria-hidden'],
     });
     applyFlags();
     scheduleScan();

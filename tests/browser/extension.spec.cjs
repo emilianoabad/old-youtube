@@ -176,8 +176,8 @@ test('auto-dubbed videos and mixes hide by default with independent, persistent 
   for(const id of ['dubbed','dubbed-legacy','mix','radio','both','shelf-dubbed']) await expect(page.locator(`#${id}`)).toBeHidden();
   for(const id of ['short-card','manual-playlist','dubbed-title','hidden-badge','mixed-shelf','shelf-regular','regular','playlist']) await expect(page.locator(`#${id}`)).toBeVisible();
   await popup.locator('summary').click();
-  const dubbed=popup.getByRole('checkbox',{name:'Hide auto-dubbed videos',exact:true});
-  const mixes=popup.getByRole('checkbox',{name:'Hide mixes',exact:true});
+  const dubbed=popup.getByRole('checkbox',{name:'No Robot Dubs',exact:true});
+  const mixes=popup.getByRole('checkbox',{name:'No Endless Mixes',exact:true});
   await expect(dubbed).toBeChecked();
   await expect(mixes).toBeChecked();
   expect(await popup.locator('body').evaluate(e=>e.offsetHeight)).toBeLessThanOrEqual(600);
@@ -245,10 +245,10 @@ test('hiding topic chips keeps the first video row below the fixed header backdr
   };
   await assertUncovered();
   await popup.locator('summary').click();
-  await popup.getByRole('checkbox',{name:'Hide topic chips',exact:true}).uncheck();
+  await popup.getByRole('checkbox',{name:'No Topic Clutter',exact:true}).uncheck();
   await expect(page.locator('#frosted-glass')).toHaveCSS('height','112px');
   await assertUncovered();
-  await popup.getByRole('checkbox',{name:'Hide topic chips',exact:true}).check();
+  await popup.getByRole('checkbox',{name:'No Topic Clutter',exact:true}).check();
   await expect(page.locator('#frosted-glass')).toHaveCSS('height','56px');
   await assertUncovered();
   await page.evaluate(()=>document.documentElement.style.setProperty('--ytd-masthead-height','64px'));
@@ -257,4 +257,87 @@ test('hiding topic chips keeps the first video row below the fixed header backdr
   // YouTube retains hidden browse pages while navigating to a watch page.
   await page.evaluate(()=>{document.querySelector('ytd-browse').hidden=true;history.pushState({},'', '/watch?v=abcdefghijk');document.dispatchEvent(new Event('yt-navigate-finish'));});
   await expect(page.locator('#frosted-glass')).toHaveCSS('height','112px');
+});
+
+const stillImage = (width=480,height=360,color='#ea7800') => `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="100%" height="100%" fill="${color}"/></svg>`;
+const originalImage = `data:image/svg+xml;base64,${Buffer.from(stillImage(480,270,'#0070dd')).toString('base64')}`;
+const thumbnailFixture = `<!doctype html><html><head><title>Video frame fixture</title><style>
+body{margin:0}ytd-video-renderer,yt-lockup-view-model{display:block}a{display:block;width:240px;height:135px;position:relative}img{display:block;width:240px;height:135px;object-fit:cover}.ytThumbnailViewModelImage{position:absolute;inset:0}#duration{position:absolute;bottom:0;right:0;color:white;background:black}#offscreen{margin-top:3000px}
+</style></head><body>
+<ytd-video-renderer><a id="thumbnail" href="/watch?v=abcdefghijk"><yt-image><img id="img" src="${originalImage}" srcset="${originalImage} 1x"></yt-image><span id="duration">10:00</span></a></ytd-video-renderer>
+<yt-lockup-view-model id="modern"><a class="ytLockupViewModelContentImage" href="/watch?v=lmnopqrstuv"><div class="ytThumbnailViewModelImage"><img src="${originalImage}"></div></a></yt-lockup-view-model>
+<yt-lockup-view-model id="playlist-thumb"><a class="ytLockupViewModelContentImage" href="/watch?v=abcdefghijk&list=PLtest"><div class="ytThumbnailViewModelImage"><img src="${originalImage}"></div></a></yt-lockup-view-model>
+<yt-lockup-view-model id="live-thumb"><a class="ytLockupViewModelContentImage" href="/watch?v=11111111111"><div class="ytThumbnailViewModelImage"><img src="${originalImage}"></div><badge-shape>LIVE</badge-shape></a></yt-lockup-view-model>
+<a href="/@channel"><img id="avatar" src="${originalImage}"></a>
+<ytd-video-renderer id="offscreen"><a id="thumbnail" href="/watch?v=22222222222"><yt-image><img id="img" src="${originalImage}"></yt-image></a></ytd-video-renderer>
+</body></html>`;
+
+test('video frames replace visible artwork, preserve sources and controls, and restore immediately', async ({setup})=>{
+  const {context,page,popup}=setup;
+  const requests=[];
+  await context.route('https://i.ytimg.com/vi/*/hq2.jpg',route=>{requests.push(route.request().url());return route.fulfill({contentType:'image/svg+xml',body:stillImage()});});
+  await context.route('https://www.youtube.com/',route=>route.fulfill({contentType:'text/html',body:thumbnailFixture}));
+  await popup.locator('summary').click();
+  const option=popup.getByRole('checkbox',{name:'No Thumbnail Bait',exact:true});
+  await expect(option).toBeChecked();
+  await option.uncheck();
+  await page.goto('https://www.youtube.com/');
+  const image=page.locator('body > ytd-video-renderer img').first();
+  await expect(image).toBeVisible();
+  const original=await image.screenshot();
+  await option.check();
+  await expect(image).toHaveCSS('content','url("https://i.ytimg.com/vi/abcdefghijk/hq2.jpg")');
+  await expect(page.locator('#modern img')).toHaveAttribute('data-oy-frame','');
+  expect(await image.screenshot()).not.toEqual(original);
+  await expect(image).toHaveAttribute('src',originalImage);
+  await expect(image).toHaveAttribute('srcset',`${originalImage} 1x`);
+  await expect(page.locator('#duration')).toBeVisible();
+  expect(await page.locator('#duration').evaluate(e=>{const r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.left+2,r.top+2));})).toBe(true);
+  for(const id of ['playlist-thumb','live-thumb','avatar','offscreen']) await expect(page.locator(`#${id} img, img#${id}`)).not.toHaveAttribute('data-oy-frame');
+  expect(requests).toHaveLength(2);
+  await option.uncheck();
+  await expect(image).toHaveCSS('content','normal');
+  expect(await image.screenshot()).toEqual(original);
+  await option.check();
+  await expect(image).toHaveAttribute('data-oy-frame','');
+  await popup.getByRole('switch').click();
+  await expect(image).not.toHaveAttribute('data-oy-frame');
+  await expect(image).toHaveCSS('content','normal');
+  await popup.getByRole('switch').click();
+  await expect(image).toHaveAttribute('data-oy-frame','');
+  expect(await popup.locator('body').evaluate(e=>e.offsetHeight)).toBeLessThanOrEqual(600);
+  await page.locator('#offscreen a').scrollIntoViewIfNeeded();
+  await expect(page.locator('#offscreen img')).toHaveAttribute('data-oy-frame','');
+});
+
+test('missing frames and recycled cards never keep stale artwork or retry endlessly', async ({setup})=>{
+  const {context,page,popup}=setup;
+  const requests=[];
+  await context.route('https://i.ytimg.com/vi/*/hq2.jpg',route=>{
+    const url=route.request().url();requests.push(url);
+    if(url.includes('/lmnopqrstuv/'))return route.fulfill({contentType:'image/svg+xml',body:stillImage(120,90)});
+    if(url.includes('/33333333333/'))return route.fulfill({status:404,body:''});
+    return route.fulfill({contentType:'image/svg+xml',body:stillImage()});
+  });
+  await context.route('https://www.youtube.com/',route=>route.fulfill({contentType:'text/html',body:thumbnailFixture}));
+  await page.goto('https://www.youtube.com/');
+  const image=page.locator('body > ytd-video-renderer img').first();
+  await expect(image).toHaveAttribute('data-oy-frame','');
+  await expect.poll(()=>requests.some(url=>url.includes('/lmnopqrstuv/'))).toBe(true);
+  await expect(page.locator('#modern img')).not.toHaveAttribute('data-oy-frame');
+  await page.evaluate(()=>{
+    const a=document.querySelector('a#thumbnail');a.href='/watch?v=33333333333';
+    a.querySelector('img').src='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270"><rect width="480" height="270" fill="green"/></svg>';
+    a.querySelector('img').removeAttribute('srcset');
+  });
+  await expect(image).not.toHaveAttribute('data-oy-frame');
+  await expect.poll(()=>requests.some(url=>url.includes('/33333333333/'))).toBe(true);
+  await page.evaluate(()=>document.querySelector('a#thumbnail').href='/watch?v=abcdefghijk');
+  await expect(image).toHaveAttribute('data-oy-frame','');
+  await popup.locator('summary').click();await popup.getByRole('checkbox',{name:'No Thumbnail Bait',exact:true}).uncheck();
+  await expect(image).toHaveCSS('content','normal');
+  await expect(image).toHaveAttribute('src',/fill="green"/);
+  await expect(image).not.toHaveAttribute('srcset');
+  expect(requests.filter(url=>url.includes('/lmnopqrstuv/'))).toHaveLength(1);
+  expect(requests.filter(url=>url.includes('/33333333333/'))).toHaveLength(1);
 });

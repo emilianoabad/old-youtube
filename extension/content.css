@@ -1,4 +1,10 @@
 /* Scope every rule to an enabled preference; disabling never leaves inline styles behind. */
+/* Preserve YouTube's original src/srcset so toggling off reveals its latest image. */
+html[data-oy-frames] img[data-oy-frame] {
+  content: var(--oy-frame) !important;
+  object-fit: cover !important;
+}
+
 html[data-oy-shorts] :is(
   ytd-reel-shelf-renderer,
   ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
