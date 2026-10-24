@@ -5,8 +5,8 @@ A calmer YouTube
 A small extension for desktop Chrome and Brave that removes distracting extras and makes video search more focused. Turn it on and browse. Customization is there when you want it.
 
 <p>
-  <img src="docs/popup-light.png" width="320" alt="Old YouTube popup in light mode, with an on/off switch and optional customization">
-  <img src="docs/popup-dark.png" width="320" alt="Old YouTube popup in dark mode, showing its optional settings">
+  <img src="docs/popup-light-no-thumbnail-bait.png" width="320" alt="Old YouTube settings in light mode, including No Thumbnail Bait and No Robot Dubs">
+  <img src="docs/popup-dark-no-thumbnail-bait.png" width="320" alt="Old YouTube settings in dark mode, including No Thumbnail Bait and No Robot Dubs">
 </p>
 
 ## What it does
