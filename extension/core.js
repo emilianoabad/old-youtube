@@ -8,6 +8,7 @@
     hidePlayables: true,
     hideAutoDubbed: true,
     hideMixes: true,
+    videoFrames: true,
     hideTopics: true,
     hidePromotions: true,
     cleanSearch: true,
@@ -60,6 +61,14 @@
     return typeof value === 'string' && /^auto[\s\u2010-\u2015-]*dubbed$/i.test(value.trim());
   }
 
+  function videoFrameURL(value) {
+    const url = youtubeURL(value);
+    const id = url?.searchParams.get('v');
+    if (url?.pathname !== '/watch' || url.searchParams.has('list') || !/^[\w-]{11}$/.test(id || '')) return null;
+    // YouTube's second generated still, independent of the uploaded thumbnail.
+    return `https://i.ytimg.com/vi/${id}/hq2.jpg`;
+  }
+
   function searchDestination(value, preferences, rememberedFilter) {
     const url = youtubeURL(value);
     if (!preferences.enabled || !preferences.videoSearch || url?.pathname !== '/results' ||
@@ -72,7 +81,7 @@
     return url.href;
   }
 
-  const api = { DEFAULTS, VIDEO_FILTER, settings, isStandard, validFilter, youtubeURL, shortDestination, isMixURL, isAutoDubbedLabel, searchDestination };
+  const api = { DEFAULTS, VIDEO_FILTER, settings, isStandard, validFilter, youtubeURL, shortDestination, isMixURL, isAutoDubbedLabel, videoFrameURL, searchDestination };
   globalThis.OldYouTube = Object.freeze(api);
   if (typeof module !== 'undefined') module.exports = api;
 })();

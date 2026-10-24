@@ -71,3 +71,10 @@ test('auto-dubbed detection requires an exact badge label', () => {
   for (const label of ['Auto-dubbed', ' Auto-dubbed ', 'Auto\u2011dubbed', 'Auto dubbed']) assert.equal(core.isAutoDubbedLabel(label), true);
   for (const label of ['Why auto-dubbed videos sound bad', 'Auto-dubbed explained', 'Dubbed', 'HD', null, undefined]) assert.equal(core.isAutoDubbedLabel(label), false);
 });
+
+test('video frames use only regular YouTube video IDs and skip playlist artwork', () => {
+  assert.equal(core.videoFrameURL('/watch?v=abcdefghijk'), 'https://i.ytimg.com/vi/abcdefghijk/hq2.jpg');
+  for (const url of ['/watch?v=short', '/watch?v=abcdefghijk&list=PLtest', '/playlist?list=PLtest', '/shorts/abcdefghijk', 'https://example.com/watch?v=abcdefghijk', 'javascript:alert(1)']) {
+    assert.equal(core.videoFrameURL(url), null, url);
+  }
+});

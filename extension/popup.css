@@ -47,7 +47,7 @@ summary::-webkit-details-marker { display: none; }
 summary:hover, .options label:hover { background: var(--hover); }
 summary svg { fill: none; stroke: currentColor; stroke-width: 1.5; }
 details[open] summary svg { transform: rotate(180deg); }
-.options { padding-bottom: 16px; }
+.options { padding-bottom: 16px; max-height: 468px; overflow-y: auto; }
 .options label { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; padding: 10px 20px; cursor: pointer; }
 input[type="checkbox"] { flex-shrink: 0; width: 18px; height: 18px; margin: 0; accent-color: var(--text); cursor: pointer; }
 button { font: inherit; color: inherit; }
