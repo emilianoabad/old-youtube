@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Old YouTube</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="core.js" defer></script>
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1><img src="icons/wordmark.svg" alt="Old YouTube" width="142" height="40"></h1>
+    <span id="status" aria-hidden="true"></span>
+    <button id="enabled" class="switch" type="button" role="switch" aria-checked="true" aria-label="Old YouTube" disabled><span></span></button>
+  </header>
+  <main>
+    <details id="customize">
+      <summary>Customize<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="options">
+        <label><span>Hide Shorts</span><input type="checkbox" data-setting="hideShorts" disabled></label>
+        <label><span>Hide Playables</span><input type="checkbox" data-setting="hidePlayables" disabled></label>
+        <label><span>Hide auto-dubbed videos</span><input type="checkbox" data-setting="hideAutoDubbed" disabled></label>
+        <label><span>Hide mixes</span><input type="checkbox" data-setting="hideMixes" disabled></label>
+        <label><span>Hide topic chips</span><input type="checkbox" data-setting="hideTopics" disabled></label>
+        <label><span>Hide promotions</span><input type="checkbox" data-setting="hidePromotions" disabled></label>
+        <label><span>Clean search results</span><input type="checkbox" data-setting="cleanSearch" disabled></label>
+        <label><span>Search videos by default</span><input type="checkbox" data-setting="videoSearch" disabled></label>
+        <label><span>Remember search filters</span><input type="checkbox" data-setting="rememberFilters" disabled></label>
+        <button id="reset" type="button" disabled>Restore defaults</button>
+      </div>
+    </details>
+    <p id="feedback" role="status" aria-live="polite"></p>
+  </main>
+</body>
+</html>

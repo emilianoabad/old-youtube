@@ -1,0 +1,16 @@
+{
+  "name": "old-youtube",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A calmer YouTube",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "test:browser": "playwright test",
+    "check": "node scripts/check.cjs",
+    "dev:brave": "node scripts/brave.cjs",
+    "icons": "node scripts/icons.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

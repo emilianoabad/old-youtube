@@ -1,0 +1,66 @@
+/* Scope every rule to an enabled preference; disabling never leaves inline styles behind. */
+html[data-oy-shorts] :is(
+  ytd-reel-shelf-renderer,
+  ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+  ytd-rich-section-renderer:has(ytm-shorts-lockup-view-model),
+  grid-shelf-view-model:has(ytm-shorts-lockup-view-model),
+  grid-shelf-view-model:has(ytm-shorts-lockup-view-model-v2),
+  ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+  ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+  yt-tab-shape:has(a[href$="/shorts"])
+) { display: none !important; }
+
+html[data-oy-shorts] [data-oy-card="shorts"],
+html[data-oy-playables] [data-oy-card="playables"] { display: none !important; }
+
+html[data-oy-auto-dubbed] [data-oy-dubbed-card],
+html[data-oy-mixes] [data-oy-mix-card] { display: none !important; }
+
+html[data-oy-playables] :is(
+  ytd-rich-section-renderer:has(a[href^="/playables"]),
+  ytd-shelf-renderer:has(a[href^="/playables"]),
+  grid-shelf-view-model:has(a[href^="/playables"]),
+  ytd-guide-entry-renderer:has(a[href^="/playables"]),
+  ytd-mini-guide-entry-renderer:has(a[href^="/playables"]),
+  ytd-playables-renderer,
+  ytd-playables-shelf-renderer
+) { display: none !important; }
+
+/* Search's type/date controls and channel navigation are intentionally retained. */
+html[data-oy-topics] :is(
+  ytd-browse ytd-feed-filter-chip-bar-renderer,
+  ytd-browse ytd-rich-grid-renderer > #header:has(ytd-feed-filter-chip-bar-renderer),
+  ytd-watch-flexy #related yt-chip-cloud-renderer,
+  ytd-watch-flexy #related yt-related-chip-cloud-renderer,
+  ytd-browse ytd-topic-link-renderer
+) { display: none !important; }
+
+/* The fixed backdrop keeps the chip bar's height after its contents are hidden. */
+html[data-oy-topics] ytd-app:has(ytd-browse:not([hidden]) ytd-feed-filter-chip-bar-renderer) #frosted-glass.with-chipbar {
+  height: var(--ytd-masthead-height, 56px) !important;
+}
+
+html[data-oy-promotions] :is(
+  ytd-browse ytd-statement-banner-renderer,
+  ytd-browse ytd-feed-nudge-renderer,
+  ytd-browse ytd-brand-video-shelf-renderer,
+  ytd-browse ytd-survey-renderer,
+  ytd-browse ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-post]),
+  ytd-browse ytd-rich-section-renderer:has(ytd-backstage-post-thread-renderer),
+  ytd-watch-flexy ytd-merch-shelf-renderer,
+  ytd-watch-flexy ytd-offer-module-renderer
+) { display: none !important; }
+
+/* Recommendation shelves are separate from the ordinary video/channel/playlist results. */
+html[data-oy-search] ytd-search :is(
+  ytd-shelf-renderer,
+  ytd-horizontal-card-list-renderer,
+  ytd-search-refinement-card-renderer,
+  ytd-search-refinement-card-list-renderer,
+  ytd-promoted-sparkles-web-renderer,
+  ytd-promoted-sparkles-text-search-renderer,
+  ytd-search-pyv-renderer,
+  ytd-ad-slot-renderer,
+  ytd-secondary-search-container-renderer,
+  [data-oy-search-shelf]
+) { display: none !important; }

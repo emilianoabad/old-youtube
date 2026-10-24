@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+  <!-- A subtle dark keyline keeps the pale outline visible on light toolbars. -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#5f6368" stroke-width="2.8">
+      <rect x="2" y="4.5" width="20" height="15" rx="4"/>
+      <path d="m10 8 6 4-6 4Z"/>
+    </g>
+    <g stroke="#e8eaed" stroke-width="1.8">
+      <rect x="2" y="4.5" width="20" height="15" rx="4"/>
+      <path d="m10 8 6 4-6 4Z"/>
+    </g>
+  </g>
+</svg>
